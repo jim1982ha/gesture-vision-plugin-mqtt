@@ -1,0 +1,19 @@
+{
+  "id": "mqtt",
+  "nameKey": "pluginMqttName",
+  "descriptionKey": "pluginMqttDescription",
+  "version": "1.0.0",
+  "author": "GestureVision Team",
+  "icon": {
+    "type": "mdi",
+    "name": "mdi-rss"
+  },
+  "capabilities": {
+    "hasGlobalSettings": true,
+    "providesActions": true
+  },
+  "globalConfigFileName": "config.mqtt.json",
+  "defaultGlobalConfigPath": "default.config.mqtt.json",
+  "backendEntry": "backend.plugin.js",
+  "frontendEntry": "frontend/index.js"
+}
