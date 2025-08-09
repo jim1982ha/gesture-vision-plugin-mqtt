@@ -1,27 +1,23 @@
 /* FILE: extensions/plugins/mqtt/frontend/index.js */
-const { translate } = window.GestureVision.services; 
-const { BasePluginGlobalSettingsComponent, GenericPluginActionSettingsComponent } = window.GestureVision.ui.components;
-
-const mqttGlobalSettingsFields = [
-    { id: 'url', type: 'text', labelKey: 'mqttBrokerUrlGlobalLabel', placeholderKey: 'mqttBrokerUrlPlaceholder', helpTextKey: 'mqttBrokerUrlGlobalHelp', required: false },
-    { id: 'username', type: 'text', labelKey: 'mqttUsernameOptional' },
-    { id: 'password', type: 'password', labelKey: 'mqttPasswordOptional' },
-];
-
-class MqttGlobalSettingsComponent extends BasePluginGlobalSettingsComponent {
-    constructor(pluginId, manifest, context) {
-        super(pluginId, manifest, context, mqttGlobalSettingsFields);
-    }
-}
-export const createMqttGlobalSettingsComponent = (pluginId, manifest, context) => new MqttGlobalSettingsComponent(pluginId, manifest, context);
-
 const mqttPluginFrontendModule = {
     manifest: { /* will be populated by loader */ },
     
-    createGlobalSettingsComponent: createMqttGlobalSettingsComponent,
+    createGlobalSettingsComponent: (pluginId, manifest, context) => {
+        const { services, uiComponents } = context;
+        const { translate } = services;
+        const { BasePluginGlobalSettingsComponent } = uiComponents;
+
+        const mqttGlobalSettingsFields = [
+            { id: 'url', type: 'text', labelKey: 'mqttBrokerUrlGlobalLabel', placeholderKey: 'mqttBrokerUrlPlaceholder', helpTextKey: 'mqttBrokerUrlGlobalHelp', required: false },
+            { id: 'username', type: 'text', labelKey: 'mqttUsernameOptional' },
+            { id: 'password', type: 'password', labelKey: 'mqttPasswordOptional' },
+        ];
+        return new BasePluginGlobalSettingsComponent(pluginId, manifest, context, mqttGlobalSettingsFields);
+    },
     
-    createActionSettingsComponent: (pluginId, manifest, context) => {
-        const actionSettingsFields = [
+    actionSettingsFields: (context) => {
+        const { translate } = context.services;
+        return [
             { id: 'mqttTopic', type: 'text', labelKey: 'mqttTopicLabel', placeholderKey: 'mqttTopicPlaceholder', required: true },
             { id: 'mqttPayloadTemplate', type: 'textarea', rows: 3, labelKey: 'mqttPayloadTemplateLabel', placeholderKey: 'mqttPayloadTemplateInput', helpTextKey: 'mqttPayloadTemplateHelp' },
             {
@@ -33,10 +29,10 @@ const mqttPluginFrontendModule = {
             },
             { id: 'mqttOptions.retain', type: 'checkbox', labelKey: 'mqttRetainLabel' }
         ];
-        return new GenericPluginActionSettingsComponent(pluginId, actionSettingsFields, context);
     },
 
-    getActionDisplayDetails: (settings) => {
+    getActionDisplayDetails: (settings, context) => {
+        const { translate } = context.services;
         if (!settings?.mqttTopic) return [{ icon: 'error_outline', value: translate("invalidMqttActionSettings") }];
         const details = [{ icon: 'rss_feed', value: settings.mqttTopic }];
         if (settings.mqttOptions) {
@@ -47,5 +43,4 @@ const mqttPluginFrontendModule = {
         return details;
     },
 };
-
 export default mqttPluginFrontendModule;
