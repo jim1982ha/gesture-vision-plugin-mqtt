@@ -1,12 +1,12 @@
 /* FILE: extensions/plugins/mqtt/action-handler.mqtt.ts */
 import { MqttClient } from 'mqtt';
 
-import { processActionTemplate } from '#shared/utils/index.js';
+import { processActionTemplate } from '#shared/index.js';
 import { createErrorResult, executeWithRetry } from '#backend/utils/action-helpers.js';
 import { MqttClientManager } from './helpers/mqtt-client-manager.js';
 import { type MqttConfig, type MqttActionInstanceSettings } from './schemas.js';
 
-import type { ActionDetails, ActionResult } from '#shared/types/index.js';
+import type { ActionDetails, ActionResult } from '#shared/index.js';
 import type { ActionHandler } from '#backend/types/index.js';
 
 export class MqttActionHandler implements ActionHandler {
@@ -71,7 +71,6 @@ export class MqttActionHandler implements ActionHandler {
         });
       });
       const mockResponse: Response = {
-        // This is still fine as a placeholder for successful MQTT publish
         ok: true,
         status: 200,
         statusText: 'Published',

@@ -8,7 +8,7 @@ import { MqttActionHandler } from './action-handler.mqtt.js';
 import manifestFromFile from './plugin.json' with { type: "json" };
 import { MqttActionSettingsSchema, MqttGlobalConfigSchema, type MqttConfig } from './schemas.js';
 
-import type { PluginManifest } from "#shared/types/index.js";
+import type { PluginManifest } from "#shared/index.js";
 
 // Helper to wrap async route handlers and catch errors
 const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<void>): RequestHandler => {

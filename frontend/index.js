@@ -3,14 +3,13 @@ const mqttPluginFrontendModule = {
     manifest: { /* will be populated by loader */ },
     
     createGlobalSettingsComponent: (pluginId, manifest, context) => {
-        const { services, uiComponents } = context;
-        const { translate } = services;
+        const { uiComponents } = context;
         const { BasePluginGlobalSettingsComponent } = uiComponents;
 
         const mqttGlobalSettingsFields = [
             { id: 'url', type: 'text', labelKey: 'mqttBrokerUrlGlobalLabel', placeholderKey: 'mqttBrokerUrlPlaceholder', helpTextKey: 'mqttBrokerUrlGlobalHelp', required: false },
-            { id: 'username', type: 'text', labelKey: 'mqttUsernameOptional' },
-            { id: 'password', type: 'password', labelKey: 'mqttPasswordOptional' },
+            { id: 'username', type: 'text', labelKey: 'mqttUsernameOptional', autocomplete: 'username' },
+            { id: 'password', type: 'password', labelKey: 'mqttPasswordOptional', autocomplete: 'current-password' },
         ];
         return new BasePluginGlobalSettingsComponent(pluginId, manifest, context, mqttGlobalSettingsFields);
     },
