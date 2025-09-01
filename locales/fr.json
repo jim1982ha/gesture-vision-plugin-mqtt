@@ -7,7 +7,7 @@
   "mqttBrokerUrlGlobalHelp": "Inclure scheme (mqtt://, mqtts://, ws://, wss://).",
   "mqttUsernameOptional": "Nom d'utilisateur (Optionnel)",
   "mqttPasswordOptional": "Mot de passe (Optionnel)",
-  "testMqttConnectionTooltip": "Tester la connexion au broker MQTT",
+  "testConnectionTooltip": "Tester la connexion au broker MQTT",
   "mqttConnectionSuccess": "Connexion MQTT réussie !",
   "mqttTestFailed": "Test MQTT échoué : {{message}}",
   "mqttBrokerUrlRequired": "L'URL du broker MQTT est requise.",

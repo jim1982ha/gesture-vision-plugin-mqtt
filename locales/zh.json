@@ -7,7 +7,7 @@
   "mqttBrokerUrlGlobalHelp": "如果需要，请包含协议 (mqtt://, mqtts://, ws://, wss://)。",
   "mqttUsernameOptional": "用户名 (可选)",
   "mqttPasswordOptional": "密码 (可选)",
-  "testMqttConnectionTooltip": "测试 MQTT Broker 连接",
+  "testConnectionTooltip": "测试 MQTT Broker 连接",
   "mqttConnectionSuccess": "MQTT 连接成功！",
   "mqttTestFailed": "MQTT 测试失败：{{message}}",
   "mqttBrokerUrlRequired": "需要 MQTT Broker URL。",
