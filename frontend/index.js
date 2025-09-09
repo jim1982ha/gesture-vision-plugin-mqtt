@@ -1,4 +1,10 @@
 /* FILE: extensions/plugins/mqtt/frontend/index.js */
+
+// Ensure the global registry exists
+if (!window.GestureVisionPlugins) {
+  window.GestureVisionPlugins = {};
+}
+
 const mqttPluginFrontendModule = {
     manifest: { /* will be populated by loader */ },
     
@@ -42,4 +48,8 @@ const mqttPluginFrontendModule = {
         return details;
     },
 };
+
+// Register the module with the global registry
+window.GestureVisionPlugins['gesture-vision-plugin-mqtt'] = mqttPluginFrontendModule;
+
 export default mqttPluginFrontendModule;
