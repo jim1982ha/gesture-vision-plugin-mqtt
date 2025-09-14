@@ -21,7 +21,7 @@ const mqttPluginFrontendModule = {
     },
     
     actionSettingsFields: (context) => {
-        const { translate } = context.services;
+        const { translate } = context.services.translationService;
         return [
             { id: 'mqttTopic', type: 'text', labelKey: 'mqttTopicLabel', placeholderKey: 'mqttTopicPlaceholder', required: true },
             { id: 'mqttPayloadTemplate', type: 'textarea', rows: 3, labelKey: 'mqttPayloadTemplateLabel', placeholderKey: 'mqttPayloadTemplateInput', helpTextKey: 'mqttPayloadTemplateHelp' },
@@ -37,7 +37,7 @@ const mqttPluginFrontendModule = {
     },
 
     getActionDisplayDetails: (settings, context) => {
-        const { translate } = context.services;
+        const { translate } = context.services.translationService;
         if (!settings?.mqttTopic) return [{ icon: 'error_outline', value: translate("invalidMqttActionSettings") }];
         const details = [{ icon: 'rss_feed', value: settings.mqttTopic }];
         if (settings.mqttOptions) {

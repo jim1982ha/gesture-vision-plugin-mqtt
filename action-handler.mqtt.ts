@@ -1,9 +1,10 @@
 /* FILE: extensions/plugins/mqtt/action-handler.mqtt.ts */
 import { MqttClient } from 'mqtt';
+import type { Response } from 'node-fetch';
 
 import { processActionTemplate } from '#shared/index.js';
 import { createErrorResult, executeWithRetry } from '#backend/utils/action-helpers.js';
-import { MqttClientManager } from './helpers/mqtt-client-manager.js';
+import { type MqttClientManager } from './helpers/mqtt-client-manager.js';
 import { type MqttConfig, type MqttActionInstanceSettings } from './schemas.js';
 
 import type { ActionDetails, ActionResult } from '#shared/index.js';
@@ -15,8 +16,8 @@ export class MqttActionHandler implements ActionHandler {
   private readonly RETRY_DELAY_MS = 1500;
   private clientManager: MqttClientManager;
 
-  constructor() {
-    this.clientManager = new MqttClientManager();
+  constructor(clientManager: MqttClientManager) {
+    this.clientManager = clientManager;
   }
 
   async execute(
@@ -90,9 +91,9 @@ export class MqttActionHandler implements ActionHandler {
       return { response: mockResponse, responseBody: instanceSettings };
     };
 
-    const isRetryable = (_error: unknown, response?: Response): boolean => {
-      if (_error instanceof Error) {
-        const msg = _error.message.toLowerCase();
+    const isRetryable = (error: unknown, response?: Response): boolean => {
+      if (error instanceof Error) {
+        const msg = error.message.toLowerCase();
         if (
           msg.includes('timeout') ||
           msg.includes('econnrefused') ||
@@ -114,73 +115,5 @@ export class MqttActionHandler implements ActionHandler {
     });
 
     return result;
-  }
-
-  public async testConnection(
-    configToTest: MqttConfig
-  ): Promise<{
-    success: boolean;
-    messageKey?: string;
-    error?: { code?: string; message?: string };
-  }> {
-    const brokerUrl = configToTest.url;
-    if (!brokerUrl)
-      return {
-        success: false,
-        messageKey: 'mqttBrokerUrlRequired',
-        error: { code: 'CONFIG_ERROR', message: 'Broker URL is required.' },
-      };
-
-    try {
-      const client = await this.clientManager.getConnectedClient(configToTest, true);
-      if (client.connected) {
-        client.end(true);
-        return { success: true, messageKey: 'mqttConnectionSuccess' };
-      } else {
-        client.end(true);
-        return {
-          success: false,
-          messageKey: 'mqttTestFailed',
-          error: {
-            code: 'CONNECTION_FAILED_UNKNOWN',
-            message: 'Client reported not connected after connect attempt.',
-          },
-        };
-      }
-    } catch (error: unknown) {
-      const typedError = error as Error & { code?: string; type?: string };
-      let messageKey = 'mqttGenericError';
-      let errorCode = typedError.code || 'UNKNOWN_MQTT_ERROR';
-
-      if (typedError.message?.toLowerCase().includes('timeout')) {
-        messageKey = 'mqttTimeout';
-        errorCode = 'TIMEOUT';
-      } else if (
-        typedError.message?.toLowerCase().includes('econnrefused') ||
-        typedError.code === 'ECONNREFUSED'
-      ) {
-        messageKey = 'mqttConnRefused';
-        errorCode = 'CONN_REFUSED';
-      } else if (
-        typedError.message?.toLowerCase().includes('eai_again') ||
-        typedError.code === 'EAI_AGAIN' ||
-        typedError.code === 'ENOTFOUND'
-      ) {
-        messageKey = 'mqttDnsError';
-        errorCode = 'DNS_ERROR';
-      } else if (
-        typedError.message?.toLowerCase().includes('auth') ||
-        typedError.message?.includes('credentials')
-      ) {
-        messageKey = 'mqttAuthFailed';
-        errorCode = 'AUTH_FAILED';
-      }
-
-      return {
-        success: false,
-        messageKey,
-        error: { code: errorCode, message: typedError.message },
-      };
-    }
   }
 }
