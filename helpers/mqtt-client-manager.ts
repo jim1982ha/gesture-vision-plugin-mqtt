@@ -56,37 +56,62 @@ export class MqttClientManager {
             const settlePromise = (error?: Error, client?: MqttClient) => {
                 if (promiseSettled) return;
                 promiseSettled = true;
-                clearTimeout(externalTimeoutId);
-                newClient.removeAllListeners();
+                
+                // Crucially, only remove the listeners specific to this connection attempt.
+                // The persistent 'error' listener (our safety net) will remain.
+                newClient.removeListener('connect', connectHandler);
+                newClient.removeListener('close', closeHandler);
                 
                 const currentCacheEntry = connectionCache.get(brokerUrl);
                 if (currentCacheEntry?.connectingPromise === connectingPromise) {
-                    if (error || !client) connectionCache.delete(brokerUrl);
-                    else connectionCache.set(brokerUrl, { client, timestamp: Date.now(), connectingPromise: null });
+                    if (error || !client) {
+                        connectionCache.delete(brokerUrl);
+                    } else {
+                        connectionCache.set(brokerUrl, { client, timestamp: Date.now(), connectingPromise: null });
+                    }
                 }
 
-                if (error) { newClient.end(true); reject(error); } 
-                else if (client) {
+                if (error) { 
+                    newClient.end(true); 
+                    reject(error); 
+                } else if (client) {
+                    // Attach a listener to clear the cache if the established connection closes later.
                     client.once('close', () => connectionCache.delete(brokerUrl));
-                    client.once('error', () => { client.end(true); connectionCache.delete(brokerUrl); });
                     resolve(client);
                 } else {
-                    newClient.end(true); reject(new Error("MQTT client settlement in inconsistent state."));
+                    newClient.end(true); 
+                    reject(new Error("MQTT client settlement in inconsistent state."));
                 }
             };
             
-            const externalTimeoutId = setTimeout(() => {
-                settlePromise(new Error(`MQTT connection timeout after ${CONNECTION_TIMEOUT_MS}ms`));
-            }, CONNECTION_TIMEOUT_MS);
+            const connectHandler = () => settlePromise(undefined, newClient);
+            const closeHandler = () => {
+                if (!promiseSettled) {
+                    settlePromise(new Error('Connection closed before a successful connection was established.'));
+                }
+            };
 
-            newClient.on('error', (err) => settlePromise(err));
-            newClient.once('connect', () => settlePromise(undefined, newClient));
+            // It catches ALL errors. It only rejects the promise if it's the *first* error.
+            // Subsequent errors are caught silently to prevent a crash.
+            newClient.on('error', (err) => {
+                if (!promiseSettled) {
+                    settlePromise(err);
+                }
+                // After the promise is settled (e.g., on timeout), this listener remains active.
+                // If the MQTT client emits another error while shutting down, this will catch it
+                // and prevent the entire Node.js process from crashing.
+            });
+
+            newClient.once('connect', connectHandler);
+            newClient.once('close', closeHandler);
         });
         
         connectionCache.set(brokerUrl, { client: null, timestamp: Date.now(), connectingPromise });
         connectingPromise.catch(() => {
             const entry = connectionCache.get(brokerUrl);
-            if (entry?.connectingPromise === connectingPromise) connectionCache.delete(brokerUrl);
+            if (entry?.connectingPromise === connectingPromise) {
+                connectionCache.delete(brokerUrl);
+            }
         });
         return connectingPromise;
     }

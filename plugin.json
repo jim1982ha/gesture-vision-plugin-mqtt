@@ -10,7 +10,8 @@
   },
   "capabilities": {
     "hasGlobalSettings": true,
-    "providesActions": true
+    "providesActions": true,
+    "canTestConnection": true
   },
   "globalConfigFileName": "config.mqtt.json",
   "defaultGlobalConfigPath": "default.config.mqtt.json",
