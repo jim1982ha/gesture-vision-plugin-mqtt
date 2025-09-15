@@ -1,5 +1,5 @@
 /* FILE: extensions/plugins/mqtt/backend.plugin.ts */
-import type { ZodSchema } from 'zod';
+import type { ZodType } from 'zod';
 import { BaseBackendPlugin } from '#backend/plugins/base-backend.plugin.js';
 import { MqttActionHandler } from './action-handler.mqtt.js';
 import { MqttClientManager } from './helpers/mqtt-client-manager.js';
@@ -26,11 +26,11 @@ class MqttBackendPlugin extends BaseBackendPlugin {
     this.#clientManager.destroy();
   }
 
-  getGlobalConfigValidationSchema(): ZodSchema | null {
+  getGlobalConfigValidationSchema(): ZodType | null {
     return MqttGlobalConfigSchema;
   }
 
-  getActionConfigValidationSchema(): ZodSchema | null {
+  getActionConfigValidationSchema(): ZodType | null {
     return MqttActionSettingsSchema;
   }
 
