@@ -16,5 +16,5 @@
   "globalConfigFileName": "config.mqtt.json",
   "defaultGlobalConfigPath": "default.config.mqtt.json",
   "backendEntry": "backend.plugin.js",
-  "frontendEntry": "frontend/index.js"
+  "frontendEntry": "frontend/index.tsx"
 }

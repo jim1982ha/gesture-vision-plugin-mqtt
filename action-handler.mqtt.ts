@@ -3,7 +3,7 @@ import { MqttClient } from 'mqtt';
 import type { Response } from 'node-fetch';
 
 import { processActionTemplate } from '#shared/index.js';
-import { createErrorResult, executeWithRetry } from '#backend/utils/action-helpers.js';
+import { createErrorResult, executeWithRetry } from '#backend/utils/index.js';
 import { type MqttClientManager } from './helpers/mqtt-client-manager.js';
 import { type MqttConfig, type MqttActionInstanceSettings } from './schemas.js';
 
